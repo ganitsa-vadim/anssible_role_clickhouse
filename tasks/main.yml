@@ -1,0 +1,45 @@
+---
+- name: Install multiple packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - apt-transport-https 
+    - ca-certificates
+    - dirmngr
+
+- name: Add ClickHouse GPG key
+  ansible.builtin.apt_key:
+    keyserver: hkp://keyserver.ubuntu.com:80
+    id: "8919F6BD2B48D754"
+    state: present
+
+- name: Add ClickHouse repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://packages.clickhouse.com/deb stable main"
+    filename: clickhouse
+    state: present
+
+- name: Install clickhouse
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - clickhouse-server 
+    - clickhouse-client
+
+- name: Deploy clickhouse users configuration file
+  template:
+    src: users.xml.j2
+    dest: /etc/clickhouse-server/users.xml
+    owner: clickhouse
+    group: clickhouse
+    mode: '0400'
+
+- name: start clickhouse
+  ansible.builtin.systemd_service:
+    name: clickhouse-server.service
+    state: started
+    enabled: true
