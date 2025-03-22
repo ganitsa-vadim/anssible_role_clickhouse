@@ -8,7 +8,7 @@
     </profiles>
     <users>
         <default>
-            <password>{{ clickhouse_password }}</password>
+            <password>{{ clickhouse.admin_password }}</password>
             <networks>
                 <ip>::/0</ip>
             </networks>
@@ -17,6 +17,18 @@
             <access_management>1</access_management>
             <named_collection_control>1</named_collection_control>
         </default>
+        {% for user in clickhouse.users %}
+        <{{ user.name }}>
+            <password>{{ user.password }}</password>
+            <profile>default</profile>
+            <quota>default</quota>
+            <access_management>{{ user.access_management }}</access_management>
+            <named_collection_control>{{ user.named_collection_control }}</named_collection_control>
+            <networks>
+                <ip>::/0</ip>
+            </networks>
+        </{{ user.name }}>
+        {% endfor %}
     </users>
     <quotas>
         <default>

@@ -30,6 +30,15 @@
     - clickhouse-server 
     - clickhouse-client
 
+- name: Deploy clickhouse configuration file
+  template:
+    src: config.xml.j2
+    dest: /etc/clickhouse-server/config.xml
+    owner: clickhouse
+    group: clickhouse
+    mode: '0400'
+  notify: restart clickhouse-server
+
 - name: Deploy clickhouse users configuration file
   template:
     src: users.xml.j2
@@ -37,9 +46,14 @@
     owner: clickhouse
     group: clickhouse
     mode: '0400'
+  notify: restart clickhouse-server
 
 - name: start clickhouse
   ansible.builtin.systemd_service:
     name: clickhouse-server.service
     state: started
     enabled: true
+
+- name: Healthcheck of clickhouse
+  ansible.builtin.uri:
+    url: "http://localhost:{{ clickhouse.http_port }}/ping"

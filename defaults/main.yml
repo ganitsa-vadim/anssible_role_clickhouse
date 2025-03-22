@@ -1,4 +1,17 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# defaults file for my_role
-clickhouse_password: password
+clickhouse:
+  admin_password: password
+  users:
+    - name: user-booser
+      password: password
+      access_management: 1
+      named_collection_control: 1 
+  data_dir: /var/lib/clickhouse/
+  logger:
+    level: information
+    log_file_path: /var/log/clickhouse-server/clickhouse-server.log
+    error_log_file_path: /var/log/clickhouse-server/clickhouse-server.err.log
+    
+  http_port: 8123
+  tcp_port: 9000
